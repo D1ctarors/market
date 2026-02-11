@@ -1,0 +1,219 @@
+{% extends "base.html" %}
+{% load static %}
+
+
+{% block title %}Карточка товара — MORE{% endblock title %}
+
+
+{% block content %}
+<section class="product-page">
+  <div class="container-xxl">
+    <div class="product-crumbs">
+      <a href="{% url 'market_app:home' %}">Главная</a>
+      <span>/</span>
+      <a href="{% url 'market_app:product_list' %}">Каталог</a>
+      <span>/</span>
+      <a href="{% url 'market_app:product_list_by_category' product.category.slug %}">{{ product.category.name }}</a>
+      <span>/</span>
+      <span>{{ product.name }}</span>
+    </div>
+
+    <div class="row g-4 align-items-start">
+      <div class="col-12 col-lg-7">
+        <div class="product-gallery">
+          {% with gallery_images=product.images.all %}
+          <div class="product-gallery__thumbs">
+            {% if product.main_image %}
+              <button class="product-thumb is-active" type="button">
+                <img src="{{ product.main_image.url }}" alt="{{ product.name }}">
+              </button>
+            {% endif %}
+            {% for image in gallery_images|slice:":4" %}
+              <button class="product-thumb {% if not product.main_image and forloop.first %}is-active{% endif %}" type="button">
+                <img src="{{ image.image.url }}" alt="{{ product.name }}">
+              </button>
+            {% empty %}
+              {% if not product.main_image %}
+                <button class="product-thumb is-active" type="button">
+                  <img src="https://images.unsplash.com/photo-1521572267360-ee0c2909d518?auto=format&fit=crop&w=900&q=80" alt="Товар">
+                </button>
+                <button class="product-thumb" type="button">
+                  <img src="https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=900&q=80" alt="Товар">
+                </button>
+              {% endif %}
+            {% endfor %}
+          </div>
+
+          <div class="product-gallery__main">
+            {% if product.main_image %}
+              <img src="{{ product.main_image.url }}" alt="{{ product.name }}">
+            {% elif gallery_images %}
+              <img src="{{ gallery_images.0.image.url }}" alt="{{ product.name }}">
+            {% else %}
+              <img src="https://images.unsplash.com/photo-1521572267360-ee0c2909d518?auto=format&fit=crop&w=1200&q=80" alt="Товар">
+            {% endif %}
+            <div class="product-badges">
+              <span class="badge-pill">new</span>
+              <span class="badge-pill badge-pill--soft">studio</span>
+            </div>
+          </div>
+          {% endwith %}
+        </div>
+
+        <div class="product-story">
+          <div class="product-story__title">О модели</div>
+          <div class="product-story__text">
+            {% if product.description %}
+              {{ product.description}}
+            {% else %}
+              Описание товара
+            {% endif %}
+          </div>
+        </div>
+      </div>
+
+      <div class="col-12 col-lg-5">
+        <div class="product-panel">
+          <div class="product-panel__header">
+            <div>
+              <div class="product-title">{{ product.name }}</div>
+              <div class="product-caption">{{ product.category.name }}</div>
+            </div>
+            <div class="product-price">{{ product.price }} ₽</div>
+          </div>
+
+          <div class="product-panel__meta">
+            <div class="product-option">
+              <div class="label-muted">Цвет</div>
+              <div class="color-row">
+                <button class="color-dot color-dot--milk is-active" type="button" aria-label="Молочный"></button>
+                <button class="color-dot color-dot--gray" type="button" aria-label="Серый"></button>
+                <button class="color-dot color-dot--black" type="button" aria-label="Чёрный"></button>
+                <span class="color-note">{{ product.color}}</span>
+              </div>
+            </div>
+
+            <div class="product-option">
+              <div class="label-muted">Размер</div>
+              <div class="size-row">
+                {% with sizes=product.product_size.all %}
+                  {% if sizes %}
+                    {% for ps in sizes %}
+                      <button class="size-pill {% if forloop.first %}is-active{% endif %}" type="button">{{ ps.size.name }}</button>
+                    {% endfor %}
+                  {% else %}
+                    <button class="size-pill is-active" type="button">S</button>
+                    <button class="size-pill" type="button">M</button>
+                    <button class="size-pill" type="button">L</button>
+                  {% endif %}
+                {% endwith %}
+              </div>
+            </div>
+
+            <div class="product-option">
+              <div class="label-muted">Количество</div>
+              <div class="product-actions">
+                <div class="qty">
+                  <button class="qty__btn" type="button">−</button>
+                  <input class="qty__input" type="number" value="1" min="1">
+                  <button class="qty__btn" type="button">+</button>
+                </div>
+                <button class="btn btn-dark btn-rounded flex-grow-1">В корзину</button>
+                <button class="btn btn-outline-dark btn-rounded" aria-label="В избранное">
+                  <i class="fa-regular fa-heart"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div class="product-quick">
+            <div class="product-quick__item">
+              <div class="product-quick__icon"><i class="fa-solid fa-truck-fast"></i></div>
+              <div>
+                <div class="product-quick__title">Доставка 1–3 дня</div>
+                <div class="product-quick__text">Бесплатно от 5000 ₽</div>
+              </div>
+            </div>
+            <div class="product-quick__item">
+              <div class="product-quick__icon"><i class="fa-solid fa-rotate-left"></i></div>
+              <div>
+                <div class="product-quick__title">Лёгкий возврат</div>
+                <div class="product-quick__text">14 дней на примерку</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="product-accordion">
+            <div class="accordion accordion-soft" id="prodAcc">
+              <div class="accordion-item">
+                <h2 class="accordion-header">
+                  <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#c2">
+                    Состав и уход
+                  </button>
+                </h2>
+                <div id="c2" class="accordion-collapse collapse" data-bs-parent="#prodAcc">
+                  <div class="accordion-body">
+                    Хлопок/полиэстер. Стирка при 30°, деликатный режим, не отбеливать.
+                  </div>
+                </div>
+              </div>
+
+              <div class="accordion-item">
+                <h2 class="accordion-header">
+                  <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#c3">
+                    Таблица размеров
+                  </button>
+                </h2>
+                <div id="c3" class="accordion-collapse collapse" data-bs-parent="#prodAcc">
+                  <div class="accordion-body">
+                    S: 42–44 • M: 46–48 • L: 50–52 (примерно, позже привяжем к реальным данным).
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="related-section">
+      <div class="related-head">
+        <div class="related-title">Вам может понравиться</div>
+        <a class="btn btn-outline-dark btn-rounded btn-sm px-3" href="{% url 'market_app:product_list' %}">Каталог</a>
+      </div>
+
+      <div class="row g-3">
+        {% for related in related_products %}
+        <div class="col-6 col-md-3">
+          <article class="product-card product-card--mini">
+            <a class="product-card__media" href="{% url 'market_app:product_detail' related.id related.slug %}">
+              {% if related.main_image %}
+                <img src="{{ related.main_image.url }}" alt="{{ related.name }}">
+              {% else %}
+                <img src="https://images.unsplash.com/photo-1521572267360-ee0c2909d518?auto=format&fit=crop&w=900&q=80" alt="Товар">
+              {% endif %}
+            </a>
+            <div class="product-card__body">
+              <div class="product-card__name">
+                <a href="{% url 'market_app:product_detail' related.id related.slug %}">{{ related.name }}</a>
+              </div>
+              <div class="product-card__meta">
+                <div class="swatches">
+                  <span class="swatch swatch--gray"></span>
+                  <span class="swatch swatch--milk"></span>
+                </div>
+                <div class="product-card__price">{{ related.price }} ₽</div>
+              </div>
+            </div>
+          </article>
+        </div>
+        {% empty %}
+        <div class="col-12">
+          <div class="text-muted">Похожих товаров пока нет.</div>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock content %}

@@ -1,0 +1,141 @@
+{% extends "base.html" %}
+{% load static %}
+
+
+{% block title %}Корзина — MORE{% endblock title %}
+
+
+{% block content %}
+<section class="cart-page">
+  <div class="container-xxl">
+    <div class="cart-head">
+      <div class="cart-crumbs">
+        <a href="{% url 'market_app:home' %}">Главная</a>
+        <span>/</span>
+        <span>Корзина</span>
+      </div>
+      <div class="cart-title-row">
+        <h1 class="cart-title">Корзина</h1>
+        <div class="cart-subtitle">Ваши товары готовы к оформлению</div>
+      </div>
+    </div>
+
+    <div class="row g-4">
+      <div class="col-12 col-lg-8">
+        <div class="cart-card">
+          <div class="cart-card__head">
+            <div class="cart-card__title">Товары</div>
+            <div class="cart-card__count">{{ cart_items|length }} позиции</div>
+          </div>
+
+          <div class="cart-list">
+            {% for item in cart_items %}
+            <article class="cart-item">
+              <div class="cart-item__media">
+                {% if item.main_image %}
+                  <img src="{{ item.main_image.url }}" alt="{{ item.name }}">
+                {% else %}
+                  <img src="https://images.unsplash.com/photo-1521572267360-ee0c2909d518?auto=format&fit=crop&w=900&q=80" alt="Товар">
+                {% endif %}
+              </div>
+
+              <div class="cart-item__body">
+                <div class="cart-item__title">{{ item.name }}</div>
+                <div class="cart-item__meta">
+                  Цвет: {{ item.color|default:"Натуральный" }}
+                  {% with sizes=item.product_size.all %}
+                    {% if sizes %}
+                      • Размеры:
+                      {% for ps in sizes %}
+                        {{ ps.size.name }}{% if not forloop.last %}, {% endif %}
+                      {% endfor %}
+                    {% endif %}
+                  {% endwith %}
+                </div>
+
+                <div class="cart-item__actions">
+                  <div class="qty">
+                    <button class="qty__btn" type="button">−</button>
+                    <input class="qty__input" type="number" value="1" min="1">
+                    <button class="qty__btn" type="button">+</button>
+                  </div>
+                  <div class="cart-item__price">{{ item.price }} ₽</div>
+                </div>
+              </div>
+
+              <button class="cart-item__remove" type="button" aria-label="Удалить">
+                <i class="fa-solid fa-xmark"></i>
+              </button>
+            </article>
+            {% empty %}
+            <div class="text-muted">Корзина пока пуста.</div>
+            {% endfor %}
+          </div>
+        </div>
+
+        <div class="cart-actions">
+          <a class="btn btn-outline-dark btn-rounded" href="{% url 'market_app:product_list' %}">← Продолжить покупки</a>
+          <button class="btn btn-dark btn-rounded">Обновить корзину</button>
+        </div>
+      </div>
+
+      <div class="col-12 col-lg-4">
+        <div class="cart-summary">
+          <div class="cart-summary__title">Итого</div>
+
+          <div class="cart-summary__row">
+            <span>Товары</span>
+            <span>18 370 ₽</span>
+          </div>
+          <div class="cart-summary__row">
+            <span>Скидка</span>
+            <span class="text-success">− 500 ₽</span>
+          </div>
+          <div class="cart-summary__row">
+            <span>Доставка</span>
+            <span>0 ₽</span>
+          </div>
+
+          <div class="cart-summary__divider"></div>
+
+          <div class="cart-summary__total">
+            <span>К оплате</span>
+            <span>17 870 ₽</span>
+          </div>
+
+          <div class="mt-3">
+            <button class="btn btn-dark btn-rounded w-100">Оформить заказ</button>
+          </div>
+
+          <div class="cart-summary__promo">
+            <div class="label-muted">Промокод</div>
+            <div class="d-flex gap-2 mt-1">
+              <input class="form-control form-control-soft" type="text" placeholder="Введите код">
+              <button class="btn btn-outline-dark btn-rounded">Ок</button>
+            </div>
+          </div>
+
+          <div class="cart-benefits">
+            <div class="cart-benefit">
+              <i class="fa-solid fa-truck-fast"></i>
+              <span>Бесплатная доставка от 5000 ₽</span>
+            </div>
+            <div class="cart-benefit">
+              <i class="fa-solid fa-rotate-left"></i>
+              <span>Возврат 14 дней без вопросов</span>
+            </div>
+            <div class="cart-benefit">
+              <i class="fa-solid fa-shield"></i>
+              <span>Безопасная оплата</span>
+            </div>
+          </div>
+
+          <div class="cart-summary__note">
+            Нажимая «Оформить», вы соглашаетесь с условиями оферты.
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock content %}

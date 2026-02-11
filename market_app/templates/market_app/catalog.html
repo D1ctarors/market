@@ -1,0 +1,149 @@
+{% extends "base.html" %}
+{% load static %}
+
+
+{% block title %}Каталог — MORE{% endblock title %}
+
+
+{% block content %}
+<section class="catalog-section">
+  <div class="container-xxl">
+    <div class="catalog-head">
+      <div class="catalog-crumbs">
+        <a href="{% url 'market_app:home' %}">Главная</a>
+        <span>/</span>
+        <span>Каталог</span>
+      </div>
+      <div class="catalog-title-row">
+        <h1 class="catalog-title">Каталог</h1>
+        <div class="catalog-caption">
+          {% if category %}{{ category.name }}{% else %}Новая коллекция{% endif %}
+        </div>
+      </div>
+    </div>
+
+    <div class="row g-4">
+      <!-- Filters -->
+      <aside class="col-12 col-lg-3">
+        <div class="filter">
+          <div class="filter__title">
+            {% if category %}{{ category.name }}{% else %}Для неё{% endif %}
+          </div>
+
+          <div class="filter__group">
+            <div class="filter__label">Категории</div>
+            {% for category in categories %}
+            <div class="form-check">
+              <input class="form-check-input" type="checkbox" id="category-{{ category.slug }}" {% if category and category.slug == category.slug %}checked{% endif %}>
+              <label class="form-check-label" for="category-{{ category.slug }}">{{ category.name }}</label>
+            </div>
+            {% empty %}
+            <div class="text-muted small">Категории появятся позже.</div>
+            {% endfor %}
+          </div>
+
+          <div class="filter__group">
+            <div class="filter__label">Цвет</div>
+            <div class="filter__chips">
+
+            <label class="chip">
+                <input type="checkbox" checked>
+                <span class="chip__swatch"></span>
+                <span class="chip__text">Все цвета</span>
+              </label>
+
+                {% for product in products %}
+                <label class="chip">
+                    <input type="checkbox">
+                    <span class="chip__swatch"></span>
+                    <span class="chip__text">{{ product.color }}</span>
+                </label>
+                {% endfor %}
+
+            </div>
+          </div>
+
+          <div class="filter__group">
+            <div class="filter__label">Сортировать</div>
+            <select class="form-select form-select-soft">
+              <option>По умолчанию</option>
+              <option>По популярности</option>
+              <option>По возрастанию цены</option>
+              <option>По убыванию цены</option>
+              <option>По новинкам</option>
+              <option>По скидке</option>
+            </select>
+          </div>
+
+          <div class="filter__group">
+            <div class="filter__label">Цена</div>
+            <div class="d-flex gap-2">
+              <input class="form-control form-control-soft" type="number" placeholder="от">
+              <input class="form-control form-control-soft" type="number" placeholder="до">
+            </div>
+          </div>
+
+          <button class="btn btn-dark btn-rounded w-100 mt-2">Применить</button>
+        </div>
+      </aside>
+
+      <!-- Catalog -->
+      <div class="col-12 col-lg-9">
+        <div class="category-strip">
+          <a class="category-pill {% if not category %}is-active{% endif %}" href="{% url 'market_app:product_list' %}">Все</a>
+          {% for category in categories %}
+          <a class="category-pill {% if category and category.slug == category.slug %}is-active{% endif %}" href="{% url 'market_app:product_list_by_category' category.slug %}">{{ category.name }}</a>
+          {% endfor %}
+        </div>
+
+        <div class="row g-3 mt-2">
+          {% for product in products %}
+          <div class="col-12 col-sm-6 col-md-4">
+            <article class="product-card">
+              <a class="product-card__media" href="{% url 'market_app:product_detail' product.id product.slug %}">
+                {% if product.main_image %}
+                  <img src="{{ product.main_image.url }}" alt="{{ product.name }}">
+                {% else %}
+                  <img src="https://images.unsplash.com/photo-1521572267360-ee0c2909d518?auto=format&fit=crop&w=900&q=80" alt="Товар">
+                {% endif %}
+              </a>
+              <div class="product-card__body">
+                <div class="product-card__header">
+                  <div class="product-card__name">
+                    <a href="{% url 'market_app:product_detail' product.id product.slug %}">{{ product.name }}</a>
+                  </div>
+                  <div class="icon-actions icon-actions--mini">
+                    <button class="icon-btn" type="button" aria-label="В избранное">
+                      <i class="fa-regular fa-heart"></i>
+                    </button>
+                    <button class="icon-btn icon-btn--dark" type="button" aria-label="В корзину">
+                      <i class="fa-solid fa-bag-shopping"></i>
+                    </button>
+                  </div>
+                </div>
+                <div class="product-card__meta">
+                  <div class="swatches">
+                    <span class="swatch swatch--milk"></span>
+                    <span class="swatch swatch--gray"></span>
+                    <span class="swatch swatch--black"></span>
+                  </div>
+                  <div class="product-card__price">{{ product.price }} ₽</div>
+                </div>
+              </div>
+            </article>
+          </div>
+          {% empty %}
+          <div class="col-12">
+            <div class="text-muted">В этой категории еще нет товаров.</div>
+          </div>
+          {% endfor %}
+        </div>
+
+        <div class="mt-3 text-center">
+          <button class="btn btn-outline-dark btn-rounded px-4">Показать ещё</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock content %}
